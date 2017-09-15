@@ -28,11 +28,18 @@ static public class GameManager {
     static public GameStates State = GameStates.Playing;
     static public TravelStates shipTravelState = TravelStates.Stopped;
 
+    static public uniqueLocation homeStation = new uniqueLocation();
+    static public string ship = "Charybdis";
+    static public int credits = 0;
+    static public string playerName;
+    static public string currentSystem;
     static public string currentScene;
     static public string nextScene;
+    public static GameObject SystemRoot;
     static public GameObject CelestialCam;
     static public GameObject WarpTarget;
     static public GameObject PlayerShip;
+
     static public List<GameObject> poiCoords = new List<GameObject>();
 
     static public List<GameObject> Notifications = new List<GameObject>();
@@ -45,10 +52,24 @@ static public class GameManager {
         CelestialCam = cam.gameObject;
     }
 
+    static public void respawn()
+    {
+        CelestialCam.transform.position = homeStation.point;
+        SMUnload(currentScene);
+        currentScene = homeStation.sceneName;
+        exitWarp();
+        GameObject ps = Resources.Load("Prefabs/Charybdis") as GameObject;
+        SystemRoot.GetComponent<StarSystem>().SpawnShip(ps);
+    }
+
     static public void setPlayerShip(GameObject go)
     {
         PlayerShip = go;
-        //Debug.Log(PlayerShip.name);
+    }
+
+    static public void setHomeStation(string sys, Vector3 pos, string sce)
+    {
+        homeStation = new uniqueLocation(sys, pos, sce);
     }
 
     static public void AddPointOfInterest(GameObject go)
@@ -77,10 +98,8 @@ static public class GameManager {
     {
         WarpTarget = go;
         setTravelState(TravelStates.Aligning);
-        Debug.Log("Aligning");
         nextScene = s;
         PlayerShip.GetComponent<ShipController>().turnSpeed = 0;
-        //OnAlignEnter.Invoke();
     }
 
     static public void exitAlign()
@@ -88,7 +107,6 @@ static public class GameManager {
         if(shipTravelState == TravelStates.Aligning)
         {
             shipTravelState = TravelStates.Stopped;
-            //OnAlignExit.Invoke();
         }
     }
 
@@ -102,13 +120,11 @@ static public class GameManager {
             }
             currentScene = nextScene;
             setTravelState(TravelStates.Warping);
-            Debug.Log("Warping...");
             PlayerShip.GetComponent<ShipWeapons>().ClearAvailableTargets();
-            //OnWarpEnter.Invoke();
         }
         else
         {
-            Debug.Log("Cannot Warp before Aligning");
+
         }
     }
 
@@ -116,8 +132,11 @@ static public class GameManager {
     {
         setTravelState(GameManager.TravelStates.Stopped);
         SceneManager.LoadScene(currentScene, LoadSceneMode.Additive);
-        Debug.Log("Warp Complete");
-        //OnWarpExit.Invoke();
+    }
+
+    static public void addCredits(int c)
+    {
+        credits += c;
     }
 
     static public void setTravelState(TravelStates s)
@@ -134,7 +153,7 @@ static public class GameManager {
 
     static private void SMUnload(string s)
     {
-        SceneManager.UnloadScene(s);
+        SceneManager.UnloadSceneAsync(s);
     }
 
     static public void addNotification(GameObject go)
@@ -150,7 +169,6 @@ static public class GameManager {
 
     public class Interface : MonoBehaviour
     {
-
         static public void createNewNotification(string s, notification.NotificationType t)
         {
             GameObject newNotification;
@@ -160,5 +178,19 @@ static public class GameManager {
             Instantiate(newNotification, Vector3.zero, new Quaternion(0, 0, 0, 0));
             newNotification = null;
         }
+    }
+}
+
+public struct uniqueLocation
+{
+    public string systemName;
+    public Vector3 point;
+    public string sceneName;
+
+    public uniqueLocation(string sName = "", Vector3 sPoint = new Vector3(), string scene = "")
+    {
+        systemName = sName;
+        point = sPoint;
+        sceneName = scene;
     }
 }

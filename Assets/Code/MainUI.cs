@@ -62,7 +62,7 @@ public class MainUI : MonoBehaviour {
                 if(GUI.Button(new Rect(Screen.width / 2 - 252, Screen.height - 200, 504, 14), "ENGAGE"))
                 {
                     GameManager.enterWarp("station_1");
-                    oneShotSources[0].PlayOneShot(oneShotSFX[0]);
+                    //oneShotSources[0].PlayOneShot(oneShotSFX[0]);
                 }
             }
             else if (wc > 0 && wc < 10)

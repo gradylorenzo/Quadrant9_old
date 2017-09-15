@@ -8,6 +8,8 @@ public class POISpawn : MonoBehaviour {
 
     public Vector3 Range = new Vector3();
     public float SpawnRateInSeconds = 120.0f;
+
+    public bool drawGizmos = false;
     private float lastSpawnTime;
 
 
@@ -29,7 +31,10 @@ public class POISpawn : MonoBehaviour {
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireCube(transform.position, Range);
+        if (drawGizmos)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(transform.position, Range);
+        }
     }
 }

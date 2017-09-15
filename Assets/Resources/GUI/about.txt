@@ -1,0 +1,20 @@
+Quadrant9
+Copyright 2017 Grady Lorenzo, All Rights Reserved.
+
+Special thanks to Josh Hollandsworth, the most badass lore god of all time.
+
+Grover Baxley, great help in testing.
+
+Sky Bettridge, my loving and supporting girlfriend <3
+
+You can follow this project by going to
+github.com/gradylorenzo/Quadrant9
+
+This project in its entirety, including the
+source found on GitHub, is under an Apache 2.0
+license. You can find that in the
+aforementioned source on GitHub, or you
+can Google it. I tried to copypaste it
+into this about.txt file, but the formatting
+was all wrong, and I'm not about to go through
+all of that.

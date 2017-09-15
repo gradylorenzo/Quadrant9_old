@@ -7,8 +7,6 @@ public class ShipSheet : MonoBehaviour {
 
     public DefensiveStats Defense;
 
-    public GameObject explosion;
-
     private string sclass;
 
     private void Start()
@@ -192,10 +190,13 @@ public class ShipSheet : MonoBehaviour {
 
     private void doDestroySequence()
     {
-        if (explosion)
-        {
-            Instantiate(explosion, transform.position, transform.rotation);
-        }
         GameManager.Interface.createNewNotification("<color=red>Your " + sclass + " was destroyed</color>", notification.NotificationType.damageDone);
+        GameObject explosion = Resources.Load("Prefabs/large_explosion") as GameObject;
+        Instantiate(explosion, transform.position, transform.rotation);
+        GameObject destroyedUI = Resources.Load("Prefabs/destroyedUI") as GameObject;
+        Instantiate(destroyedUI, transform.position, transform.rotation);
+        explosion = null;
+        destroyedUI = null;
+        Destroy(gameObject);
     }
 }

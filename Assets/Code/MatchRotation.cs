@@ -12,5 +12,9 @@ public class MatchRotation : MonoBehaviour {
         {
             this.transform.rotation = target.transform.rotation;
         }
+        else
+        {
+            target = Camera.main.gameObject;
+        }
     }
 }
