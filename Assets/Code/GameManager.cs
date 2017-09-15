@@ -29,9 +29,11 @@ static public class GameManager {
     static public TravelStates shipTravelState = TravelStates.Stopped;
 
     static public uniqueLocation homeStation = new uniqueLocation();
+
     static public string ship = "Charybdis";
     static public int credits = 0;
     static public string playerName;
+
     static public string currentSystem;
     static public string currentScene;
     static public string nextScene;

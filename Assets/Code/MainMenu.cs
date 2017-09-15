@@ -31,8 +31,11 @@ public class MainMenu : MonoBehaviour {
     public Vector2 pos;
     public Vector2 settingsPos;
     public Vector2 aboutPos;
+    public fadingbg fadeBG;
 
     private Settings.Volumes tempVol = new Settings.Volumes();
+
+    private bool allowLoad = true;
 
     private void Awake()
     {
@@ -42,6 +45,11 @@ public class MainMenu : MonoBehaviour {
     void InitializeSettings()
     {
         State = menuStates.loadingSettings;
+    }
+
+    private void Start()
+    {
+        fadeBG = transform.FindChild("fading_bg").GetComponent<fadingbg>();
     }
 
     private void OnGUI()
@@ -59,13 +67,14 @@ public class MainMenu : MonoBehaviour {
             GUILayout.EndArea();
 
             Settings.LoadSettings();
-            if (Settings.playerName == "")
+            Settings.LoadHomeStation();
+            if (Settings.Profile.playerName == "")
             {
                 State = menuStates.playerNameEntry;
             }
             else
             {
-                playerName = Settings.playerName;
+                playerName = Settings.Profile.playerName;
                 State = menuStates.mainMenu;
             }
         }
@@ -77,11 +86,12 @@ public class MainMenu : MonoBehaviour {
                 GUILayout.BeginVertical();
                     GUILayout.Label("Enter Player Name..");
                     playerName = GUILayout.TextField(playerName);
-                    if (GUILayout.Button("Start"))
+                    if (GUILayout.Button("Start", GUILayout.Height(60)))
                     {
                         if(playerName != "")
                         {
-                    Settings.SaveSettings(playerName, Settings.Volume.sfx, Settings.Volume.music, Settings.Volume.UI, Settings.Volume.voice, Settings.credits);
+                            Settings.SaveDefaultSettings();
+                            Settings.SaveSettings(playerName, Settings.Volume.sfx, Settings.Volume.music, Settings.Volume.UI, Settings.Volume.voice, Settings.Profile.credits);
                             InitializeSettings();
                         }
                         else
@@ -102,7 +112,7 @@ public class MainMenu : MonoBehaviour {
                 GUILayout.BeginArea(new Rect(12, 6, 500, 50));
                 GUILayout.BeginVertical();
                 GUILayout.Label("Welcome, " + playerName);
-                GUILayout.Label("Credits: " + Settings.credits);
+                GUILayout.Label("Credits: " + Settings.Profile.credits);
                 GUILayout.EndVertical();
                 GUILayout.EndArea();
             }
@@ -111,7 +121,7 @@ public class MainMenu : MonoBehaviour {
                 GUILayout.BeginHorizontal();
                     if (GUILayout.Button("Start", GUILayout.Height(60), GUILayout.Width((Screen.width / 4) - logo.width / 4)))
                     {
-                        SceneManager.LoadSceneAsync("A1");
+                        fadeBG.fadeOut();
                     }
                     GUILayout.Space(4);
                     if (GUILayout.Button("Settings", GUILayout.Height(60), GUILayout.Width((Screen.width / 4) - logo.width / 4)))
@@ -154,13 +164,19 @@ public class MainMenu : MonoBehaviour {
             GUI.Window(0, new Rect(Screen.width / 2 - 200, Screen.height / 2 - 200, 400, 104), doQuitWindow, "Confirm");
         }
 #endregion
+
+        if(fadeBG.State == fadingbg.fadeState.full && allowLoad)
+        {
+            SceneManager.LoadSceneAsync("A1");
+            allowLoad = false;
+;        }
     }
 
 
     #region Window methods
     public void doSettingsWindow(int id)
     {
-        GUILayout.BeginArea(new Rect(4, 20, 396, 400));
+        GUILayout.BeginArea(new Rect(4, 20, 394, 400));
         GUILayout.BeginVertical();
 
         GUILayout.Label("Volume Settings");
@@ -197,14 +213,14 @@ public class MainMenu : MonoBehaviour {
 
         if (GUILayout.Button("Save", GUILayout.Height(60)))
         {
-            Settings.SaveSettings(Settings.playerName, tempVol.sfx, tempVol.music, tempVol.UI, tempVol.voice, Settings.credits);
+            Settings.SaveSettings(Settings.Profile.playerName, tempVol.sfx, tempVol.music, tempVol.UI, tempVol.voice, Settings.Profile.credits);
             currentMenu = menus.none;
         }
 
         GUILayout.EndVertical();
         GUILayout.EndArea();
 
-        if (GUI.Button(new Rect(382, 4, 10, 10), "X"))
+        if (GUI.Button(new Rect(382, 4, 10, 10), " ", gs.customStyles[1]))
         {
             currentMenu = menus.none;
         }
@@ -213,15 +229,15 @@ public class MainMenu : MonoBehaviour {
     public void doAboutWindow(int id)
     {
         string text = "";
-        text = "Quadrant9 \nCopyright 2017 Grady Lorenzo, All Rights Reserved. \n\nSpecial thanks to Josh Hollandsworth, the most badass lore god of all time. \n\nGrover Baxley, great help in testing. \n\nSky Bettridge, my loving and supporting girlfriend < 3 \n\nYou can follow this project by going to \ngithub.com/gradyloreno/Quadrant9 \nThis project in its entirety, including the \nsource found on GitHub, is under an Apache 2.0 \nlicense.You can find that in the \naforementioned source on GitHub, or you \ncan Google it.I tried to copypaste it \ninto this about.txt file, but the formatting \nwas all wrong, and I'm not about to go through \nall of that.";
-        GUILayout.BeginArea(new Rect(4, 20, 396, 400));
+        text = "Quadrant9 \nCopyright 2017 Grady Lorenzo, All Rights Reserved. \n\nSpecial thanks to Josh Hollandsworth, the most badass lore god of all time. \n\nGrover Baxley, great help in testing. \n\nSky Bettridge, my loving and supporting girlfriend < 3 \n\nYou can follow this project by going to \ngithub.com/gradyloreno/Quadrant9\n\nThis project in its entirety, including the \nsource found on GitHub, is under an Apache 2.0 \nlicense.You can find that in the \naforementioned source on GitHub, viewable at:\n\nhttp://www.apache.org/licenses/LICENSE-2.0";
+        GUILayout.BeginArea(new Rect(4, 20, 394, 400));
         aboutPos = GUILayout.BeginScrollView(aboutPos);
         GUILayout.BeginVertical();
         GUILayout.Label(text);
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
         GUILayout.EndArea();
-        if(GUI.Button(new Rect(382, 4, 10, 10), "X"))
+        if(GUI.Button(new Rect(382, 4, 10, 10), " ", gs.customStyles[1]))
         {
             currentMenu = menus.none;
         }
@@ -229,7 +245,7 @@ public class MainMenu : MonoBehaviour {
 
     public void doQuitWindow(int id)
     {
-        GUILayout.BeginArea(new Rect(4, 20, 396, 200));
+        GUILayout.BeginArea(new Rect(4, 20, 394, 200));
         GUILayout.BeginVertical();
         GUILayout.Label("Are you sure?", gs.customStyles[0]);
         GUILayout.Space(4);

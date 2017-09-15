@@ -16,7 +16,6 @@ public class StarSystem : MonoBehaviour {
         SystemScale = this.transform.localScale.x;
         GameManager.currentScene = SystemName;
         GameManager.SystemRoot = gameObject;
-        GameManager.setHomeStation("A1", new Vector3(-28.4f, 0.0f, -12.0f), "player_station_1");
         if (!GameManager.PlayerShip)
         {
             GameManager.respawn();

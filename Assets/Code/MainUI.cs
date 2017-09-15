@@ -5,6 +5,21 @@ using UnityEngine;
 
 public class MainUI : MonoBehaviour {
 
+    public class UIWindows
+    {
+        GameObject playerShip;
+
+        public Dictionary<string, Rect> WindowRects = new Dictionary<string, Rect>()
+    {
+        {"loadout", new Rect(200, 200, 500, 500) },
+    };
+
+        public Dictionary<string, bool> WindowBools = new Dictionary<string, bool>()
+    {
+        {"loadout", false },
+    };
+    }
+
     public GameObject playerShip;
     public AudioSource[] oneShotSources;
     public AudioClip[] oneShotSFX;
@@ -348,7 +363,7 @@ public class MainUI : MonoBehaviour {
             #region windows
             if (Windows.WindowBools["loadout"])
             {
-                Windows.WindowRects["loadout"] = GUILayout.Window(0, Windows.WindowRects["loadout"], Windows.doLoadoutWindow, "Loadout");
+                Windows.WindowRects["loadout"] = GUILayout.Window(0, Windows.WindowRects["loadout"], doLoadoutWindow, "Loadout");
             }    
 
 
@@ -360,26 +375,14 @@ public class MainUI : MonoBehaviour {
             playerShip = GameManager.PlayerShip;
         }
     }
-}
-
-public class UIWindows
-{
-    GameObject playerShip;
-
-    public Dictionary<string, Rect> WindowRects = new Dictionary<string, Rect>()
-    {
-        {"loadout", new Rect(200, 200, 500, 500) },
-    };
-
-    public Dictionary<string, bool> WindowBools = new Dictionary<string, bool>()
-    {
-        {"loadout", false },
-    };
-
 
     //loadout window
     public void doLoadoutWindow(int windowID)
     {
+        if (GUI.Button(new Rect(382, 4, 10, 10), " ", gs.customStyles[9]))
+        {
+            Windows.WindowBools["loadout"] = false;
+        }
 
         if (playerShip)
         {

@@ -18,3 +18,5 @@ can Google it. I tried to copypaste it
 into this about.txt file, but the formatting
 was all wrong, and I'm not about to go through
 all of that.
+
+("A1", new Vector3(-28.4f, 0.0f, -12.0f), "player_station_1")
