@@ -23,6 +23,69 @@ public class ShipModuleHost : MonoBehaviour {
                 sm.UpdateModule(this.GetComponent<ShipWeapons>().SelectedTarget, gameObject);
             }
         }
+
+        #region F-keys
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            if(modules[0])
+            modules[0].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            if (modules[1])
+                modules[1].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if (modules[2])
+                modules[2].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            if (modules[3])
+                modules[3].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            if (modules[4])
+                modules[4].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+            if (modules[5])
+                modules[5].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F7))
+        {
+            if (modules[6])
+                modules[6].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            if (modules[7])
+                modules[7].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            if (modules[8])
+                modules[8].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            if (modules[9])
+                modules[9].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            if (modules[10])
+                modules[10].Activate();
+        }
+        if (Input.GetKeyDown(KeyCode.F12))
+        {
+            if (modules[11])
+                modules[11].Activate();
+        }
+        #endregion
     }
 
     public void updateEquippedModules (string[] mods)

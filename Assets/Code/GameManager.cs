@@ -57,7 +57,10 @@ static public class GameManager {
     static public void respawn()
     {
         CelestialCam.transform.position = homeStation.point;
-        SMUnload(currentScene);
+        if (currentScene != null)
+        {
+            SMUnload(currentScene);
+        }
         currentScene = homeStation.sceneName;
         exitWarp();
         GameObject ps = Resources.Load("Prefabs/Charybdis") as GameObject;
@@ -139,6 +142,16 @@ static public class GameManager {
     static public void addCredits(int c)
     {
         credits += c;
+        Settings.WriteCredits(credits);
+
+        if(c > 0)
+        {
+            Interface.createNewNotification(("<color=yellow>" + c.ToString() + "</color> credits added to wallet"), notification.NotificationType.standard);
+        }
+        else
+        {
+            Interface.createNewNotification(("<color=red>" + c.ToString() + "</color> credits deducted from wallet"), notification.NotificationType.standard);
+        }
     }
 
     static public void setTravelState(TravelStates s)

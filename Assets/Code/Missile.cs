@@ -57,8 +57,11 @@ public class Missile : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Targetable")
         {
-            collision.gameObject.GetComponent<Targetable>().takeDamage(damage * Random.Range(0.5f, 2f), damageType);
-            Detonate();
+            if (!collision.gameObject.GetComponent<Targetable>().Defense.isImmune)
+            {
+                collision.gameObject.GetComponent<Targetable>().takeDamage(damage * Random.Range(0.5f, 2f), damageType, this.name);
+                Detonate();
+            }
         }
     }
 

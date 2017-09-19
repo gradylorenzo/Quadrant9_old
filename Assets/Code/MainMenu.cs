@@ -14,15 +14,15 @@ public class MainMenu : MonoBehaviour {
     }
     public enum menuStates
     {
-        loadingSettings,
+        eula,
+        loadingSaves,
+        listingSaves,
         playerNameEntry,
         mainMenu
     }
 
     public menuStates State;
     public menus currentMenu;
-
-    public string playerName;
 
     public float logoScale;
     public Texture2D logo;
@@ -31,20 +31,50 @@ public class MainMenu : MonoBehaviour {
     public Vector2 pos;
     public Vector2 settingsPos;
     public Vector2 aboutPos;
+    public Vector2 savesPos;
+    public Vector2 eulaPos;
     public fadingbg fadeBG;
 
     private Settings.Volumes tempVol = new Settings.Volumes();
 
     private bool allowLoad = true;
 
+    private string tempname = "";
+    private bool firstRun = false;
+
+
     private void Awake()
     {
-        InitializeSettings();        
+        Initialize();
     }
 
-    void InitializeSettings()
+    void Initialize()
     {
-        State = menuStates.loadingSettings;
+        if (PlayerPrefs.HasKey("eulaagreed"))
+        {
+            if (PlayerPrefs.GetInt("eulaagreed") == 1)
+            {
+                firstRun = false;
+            }
+            else
+            {
+                firstRun = true;
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetInt("eulaagreed", 0);
+            firstRun = true;
+        }
+
+        if (firstRun)
+        {
+            State = menuStates.eula;
+        }
+        else
+        {
+            State = menuStates.loadingSaves;
+        }
     }
 
     private void Start()
@@ -59,47 +89,97 @@ public class MainMenu : MonoBehaviour {
             GUI.skin = gs;
         }
 
-        //Loading settings
-        if(State == menuStates.loadingSettings)
+        //EULA Message
+        if(State == menuStates.eula)
         {
-            GUILayout.BeginArea(new Rect(5, 5, Screen.width / 4, 500));
-            GUILayout.Label("Loading player settings..");
-            GUILayout.EndArea();
-
-            Settings.LoadSettings();
-            Settings.LoadHomeStation();
-            if (Settings.Profile.playerName == "")
+            GUILayout.BeginArea(new Rect(Screen.width / 2 - 200, 100, 400, Screen.height - 200), "Welcome to Quadrant 9", gs.window);
+            GUILayout.BeginVertical();
+            eulaPos = GUILayout.BeginScrollView(eulaPos);
+            GUILayout.Space(10);
+            GUILayout.Label("Thank you for playing Quadrant 9\n\nIf you are playing this, it's likely you obtained a copy directly from me, as the game is not yet in a proper release state. If you did not obtain this game from me, you are more than welcome to continue playing, but please understand the game is not completed, and the bugs are many.\n\nTo report bugs (I'd greatly appreciate it), you may contact me via Discord @Nyxton#6759. Also understand that, no matter how you obtained this game, by clicking 'Continue', you are agreeing to an Apache 2.0 license, which you can read by clicking 'License' below.\n\nThank you, and enjoy Quadrant 9 :)\n\n-Grady Lorenzo");
+            GUILayout.Space(10);
+            GUILayout.EndScrollView();
+            if (GUILayout.Button("Continue", GUILayout.Height(60)))
             {
-                State = menuStates.playerNameEntry;
+                PlayerPrefs.SetInt("eulaagreed", 1);
+                Initialize();
+            }
+            GUILayout.Space(10);
+            if (GUILayout.Button("License", GUILayout.Height(60)))
+            {
+                Application.OpenURL("https://github.com/gradylorenzo/Quadrant9/blob/master/LICENSE");
+            }
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
+        }
+
+        //Loading settings
+        if(State == menuStates.loadingSaves)
+        {
+            Settings.LoadSaveList();
+            if(Settings.saveList.Count > 0)
+            {
+                State = menuStates.listingSaves;
             }
             else
             {
-                playerName = Settings.Profile.playerName;
-                State = menuStates.mainMenu;
+                State = menuStates.playerNameEntry;
             }
+        }
+
+        //Save list
+        else if(State == menuStates.listingSaves)
+        {
+            GUILayout.BeginArea(new Rect(Screen.width / 2 - 200, 100, 400, Screen.height - 200), "Select Profile", gs.window);
+            GUILayout.BeginVertical();
+            GUILayout.Space(10);
+            savesPos = GUILayout.BeginScrollView(savesPos);
+            foreach (KeyValuePair<string, string> v in Settings.saveList)
+            {
+                if(GUILayout.Button(v.Value, GUILayout.Height(60)))
+                {
+                    Settings.ReadSave(v.Key);
+                    State = menuStates.mainMenu;
+                }
+                GUILayout.Space(10);
+            }
+            GUILayout.EndScrollView();
+            GUILayout.Space(10);
+            if(GUILayout.Button("New Game", GUILayout.Height(60)))
+            {
+                State = menuStates.playerNameEntry;
+            }
+            
+            GUILayout.EndVertical();
+            GUILayout.EndArea();
         }
 
         //Player Name entry
         else if(State == menuStates.playerNameEntry)
         {
-            GUILayout.BeginArea(new Rect(5, 5, Screen.width / 4, 500));
-                GUILayout.BeginVertical();
-                    GUILayout.Label("Enter Player Name..");
-                    playerName = GUILayout.TextField(playerName);
-                    if (GUILayout.Button("Start", GUILayout.Height(60)))
-                    {
-                        if(playerName != "")
-                        {
-                            Settings.SaveDefaultSettings();
-                            Settings.SaveSettings(playerName, Settings.Volume.sfx, Settings.Volume.music, Settings.Volume.UI, Settings.Volume.voice, Settings.Profile.credits);
-                            InitializeSettings();
-                        }
-                        else
-                        {
-                            GUILayout.Label("Player Name cannot be empty");
-                        }
-                    }
-                GUILayout.EndVertical();
+            GUILayout.BeginArea(new Rect(Screen.width / 2 - 200, 200, 400, Screen.height - 400), "New Game");
+            GUILayout.BeginVertical();
+            GUILayout.Space(10);
+            GUILayout.Label("Enter Player Name", gs.customStyles[0]);
+            GUILayout.Space(10);
+            tempname = GUILayout.TextField(tempname);
+            GUILayout.Space(10);
+            if (tempname == "")
+            {
+                GUILayout.Label("<color=red>Name cannot be left blank</color>", gs.customStyles[0]);
+                GUILayout.Space(10);
+            }
+            else
+            {
+                if (GUILayout.Button("Start", GUILayout.Height(60)))
+                {
+                    Settings.WriteNewProfile(tempname);
+                    State = menuStates.loadingSaves;
+                    tempname = "";
+                }
+            }
+            
+            GUILayout.EndVertical();
             GUILayout.EndArea();
         }
 
@@ -111,7 +191,7 @@ public class MainMenu : MonoBehaviour {
                 GUI.DrawTexture(new Rect(0, 0, Screen.width, 60), background);
                 GUILayout.BeginArea(new Rect(12, 6, 500, 50));
                 GUILayout.BeginVertical();
-                GUILayout.Label("Welcome, " + playerName);
+                GUILayout.Label("Welcome, " + Settings.Profile.playerName);
                 GUILayout.Label("Credits: " + Settings.Profile.credits);
                 GUILayout.EndVertical();
                 GUILayout.EndArea();
@@ -163,7 +243,7 @@ public class MainMenu : MonoBehaviour {
         {
             GUI.Window(0, new Rect(Screen.width / 2 - 200, Screen.height / 2 - 200, 400, 104), doQuitWindow, "Confirm");
         }
-#endregion
+        #endregion
 
         if(fadeBG.State == fadingbg.fadeState.full && allowLoad)
         {
@@ -174,11 +254,16 @@ public class MainMenu : MonoBehaviour {
 
 
     #region Window methods
+    public void doSaveListWindow (int id)
+    {
+        
+    }
+
     public void doSettingsWindow(int id)
     {
         GUILayout.BeginArea(new Rect(4, 20, 394, 400));
         GUILayout.BeginVertical();
-
+        settingsPos = GUILayout.BeginScrollView(settingsPos);
         GUILayout.Label("Volume Settings");
         GUILayout.BeginHorizontal();
         GUILayout.Label("SFX", GUILayout.Width(150));
@@ -198,8 +283,8 @@ public class MainMenu : MonoBehaviour {
         GUILayout.BeginVertical();
         GUILayout.BeginHorizontal();
         GUILayout.Label("UI", GUILayout.Width(150));
-        tempVol.UI = GUILayout.HorizontalSlider(tempVol.UI, 0, 1, GUILayout.Width(200));
-        GUILayout.Label(tempVol.UI.ToString("0.#"), GUILayout.Width(50));
+        tempVol.ui = GUILayout.HorizontalSlider(tempVol.ui, 0, 1, GUILayout.Width(200));
+        GUILayout.Label(tempVol.ui.ToString("0.#"), GUILayout.Width(50));
         GUILayout.EndHorizontal();
         GUILayout.Space(10);
 
@@ -210,13 +295,17 @@ public class MainMenu : MonoBehaviour {
         GUILayout.Label(tempVol.voice.ToString("0.#"), GUILayout.Width(50));
         GUILayout.EndHorizontal();
         GUILayout.Space(30);
-
+        GUILayout.EndScrollView();
         if (GUILayout.Button("Save", GUILayout.Height(60)))
         {
-            Settings.SaveSettings(Settings.Profile.playerName, tempVol.sfx, tempVol.music, tempVol.UI, tempVol.voice, Settings.Profile.credits);
+            Settings.WriteSettings(tempVol.sfx, tempVol.music, tempVol.ui, tempVol.voice);
             currentMenu = menus.none;
         }
-
+        if (GUILayout.Button("Reset", GUILayout.Height(60)))
+        {
+            tempVol = null;
+            tempVol = new Settings.Volumes();
+        }
         GUILayout.EndVertical();
         GUILayout.EndArea();
 
@@ -229,7 +318,7 @@ public class MainMenu : MonoBehaviour {
     public void doAboutWindow(int id)
     {
         string text = "";
-        text = "Quadrant9 \nCopyright 2017 Grady Lorenzo, All Rights Reserved. \n\nSpecial thanks to Josh Hollandsworth, the most badass lore god of all time. \n\nGrover Baxley, great help in testing. \n\nSky Bettridge, my loving and supporting girlfriend < 3 \n\nYou can follow this project by going to \ngithub.com/gradyloreno/Quadrant9\n\nThis project in its entirety, including the \nsource found on GitHub, is under an Apache 2.0 \nlicense.You can find that in the \naforementioned source on GitHub, viewable at:\n\nhttp://www.apache.org/licenses/LICENSE-2.0";
+        text = "Quadrant9  Copyright 2017 Grady Lorenzo, All Rights Reserved.   Special thanks to Josh Hollandsworth, the most badass lore god of all time.   Grover Baxley, great help in testing.   Sky Bettridge, my loving and supporting girlfriend < 3   You can follow this project by going to  github.com/gradyloreno/Quadrant9  This project in its entirety, including the  source found on GitHub, is under an Apache 2.0  license.You can find that in the  aforementioned source on GitHub, viewable at:  http://www.apache.org/licenses/LICENSE-2.0";
         GUILayout.BeginArea(new Rect(4, 20, 394, 400));
         aboutPos = GUILayout.BeginScrollView(aboutPos);
         GUILayout.BeginVertical();

@@ -5,9 +5,6 @@ using UnityEngine;
 public class CelestialCamera : MonoBehaviour {
 
     [SerializeField]
-    private StarSystem ThisStarSystem;
-
-    [SerializeField]
     private Vector3 destinationTrue;
 
     [SerializeField]
@@ -20,7 +17,6 @@ public class CelestialCamera : MonoBehaviour {
 
     private void Start()
     {
-        ThisStarSystem = GameObject.FindGameObjectWithTag("CelestialSystem").GetComponent<StarSystem>();
         GameManager.setCelestialCamera(this.GetComponent<Camera>());
     }
 

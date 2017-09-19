@@ -9,6 +9,7 @@ public class small_ship_ai : MonoBehaviour {
     public bool showWeaponEffects;
     public float WeaponEffectsDuration;
 
+
     public GameObject target;
 
     private void Start()

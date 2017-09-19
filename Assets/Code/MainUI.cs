@@ -10,14 +10,16 @@ public class MainUI : MonoBehaviour {
         GameObject playerShip;
 
         public Dictionary<string, Rect> WindowRects = new Dictionary<string, Rect>()
-    {
-        {"loadout", new Rect(200, 200, 500, 500) },
-    };
+        {
+            {"loadout", new Rect(200, 200, 500, 500) },
+            {"profile", new Rect(200, 200, 500, 500) },
+        };
 
         public Dictionary<string, bool> WindowBools = new Dictionary<string, bool>()
-    {
-        {"loadout", false },
-    };
+        {
+            {"loadout", false },
+            {"profile", false },
+        };
     }
 
     public GameObject playerShip;
@@ -48,6 +50,7 @@ public class MainUI : MonoBehaviour {
     private float sbwidth = 68;
     private float sbPos = -68;
     private float wantedsbPos = -68;
+    private int i = 0;
 
     private void Start()
     {
@@ -73,7 +76,7 @@ public class MainUI : MonoBehaviour {
 
             if (wc == 10)
             {
-                GUI.Label(new Rect(Screen.width / 2 - 252, Screen.height - 220, 504, 20), "READY TO ENGAGE");
+                GUI.Label(new Rect(Screen.width / 2 - 252, Screen.height - 220, 504, 20), "READY TO ENGAGE", gs.customStyles[10]);
                 if(GUI.Button(new Rect(Screen.width / 2 - 252, Screen.height - 200, 504, 14), "ENGAGE"))
                 {
                     GameManager.enterWarp("station_1");
@@ -82,7 +85,7 @@ public class MainUI : MonoBehaviour {
             }
             else if (wc > 0 && wc < 10)
             {
-                GUI.Label(new Rect(Screen.width / 2 - 252, Screen.height - 220, 504, 20), "WARP DRIVE CHARGING...");
+                GUI.Label(new Rect(Screen.width / 2 - 252, Screen.height - 220, 504, 20), "WARP DRIVE CHARGING...", gs.customStyles[10]);
                 GUI.DrawTexture(new Rect(Screen.width / 2 - 252, Screen.height - 200, 504, 14), frame);
                 GUI.DrawTexture(new Rect(Screen.width / 2 - 250, Screen.height - 198, 50 * wc, 10), bar);
             }
@@ -235,7 +238,7 @@ public class MainUI : MonoBehaviour {
                         if (go.GetComponent<Targetable>().Type == Targetable.targetTypes.hostile && go.transform.FindChild("graphic").GetComponent<Renderer>().isVisible)
                         {
                             Vector3 pos = cam.WorldToScreenPoint(go.transform.position);
-                            GUI.DrawTexture(new Rect(pos.x - 8, Screen.height - (pos.y + 8), 16, 16), icons[1]);
+                            GUI.DrawTexture(new Rect(pos.x - (icons[1].width / 2), Screen.height - (pos.y + (icons[1].height / 2)), icons[1].width, icons[1].height), icons[1]);
                         }
                     }
                 }
@@ -246,7 +249,7 @@ public class MainUI : MonoBehaviour {
                     if (weapons.SelectedTarget.transform.FindChild("graphic").GetComponent<Renderer>().isVisible)
                     {
                         Vector3 pos = cam.WorldToScreenPoint(weapons.SelectedTarget.transform.position);
-                        GUI.DrawTexture(new Rect(pos.x - 8, Screen.height - (pos.y + 8), 16, 16), icons[0]);
+                        GUI.DrawTexture(new Rect(pos.x - (icons[0].width / 2), Screen.height - (pos.y + (icons[0].height / 2)), icons[0].width, icons[0].height), icons[0]);
                     }
                 }
 
@@ -259,11 +262,10 @@ public class MainUI : MonoBehaviour {
                         Quaternion lookRot = Quaternion.LookRotation(relativePos);
                         float ang = Quaternion.Angle(lookRot, GameManager.CelestialCam.transform.rotation);
                         float dis = Vector3.Distance(GameManager.CelestialCam.transform.position, go.transform.position);
-                        //print(ang);
                         if (ang < GameManager.CelestialCam.GetComponent<Camera>().fieldOfView + 4  && dis > .1f)
                         {
                             Vector3 pos = GameManager.CelestialCam.GetComponent<Camera>().WorldToScreenPoint(go.transform.position);
-                            if(GUI.Button(new Rect(pos.x - 8, Screen.height - (pos.y + 8), 16, 16), icons[2], gs.customStyles[6]))
+                            if(GUI.Button(new Rect(pos.x - (icons[2].width / 2), Screen.height - (pos.y + (icons[2].height / 2)), icons[2].width, icons[2].height), icons[2], gs.customStyles[6]))
                             {
                                 GameManager.enterAlign(go, go.GetComponent<PointOfInterest>().sceneToLoad);
                             }
@@ -271,7 +273,7 @@ public class MainUI : MonoBehaviour {
                             float mDis = Vector2.Distance(pos, Input.mousePosition);
                             if(mDis < 20)
                             {
-                                GUI.Label(new Rect(pos.x + 13, Screen.height - (pos.y + 8), 200, 16), go.GetComponent<PointOfInterest>().poiName);
+                                GUI.Label(new Rect(pos.x + 13, Screen.height - (pos.y + 8), go.GetComponent<PointOfInterest>().poiName.Length * 8, 16), go.GetComponent<PointOfInterest>().poiName, gs.customStyles[10]);
                             }
                         }
                     }
@@ -310,7 +312,7 @@ public class MainUI : MonoBehaviour {
 
             #region modules_display
 
-            GUILayout.BeginArea(new Rect(700, Screen.height - 64, playerShip.GetComponent<ShipModuleHost>().modules.Length * 69, 200));
+            GUILayout.BeginArea(new Rect(700, Screen.height - 85, playerShip.GetComponent<ShipModuleHost>().modules.Length * 69, 200));
             GUILayout.BeginHorizontal();
             foreach (ShipModule sm in playerShip.GetComponent<ShipModuleHost>().modules)
             {
@@ -318,9 +320,26 @@ public class MainUI : MonoBehaviour {
 
                 if (sm != null)
                 {
-                    if (GUILayout.Button(sm.icon, gs.customStyles[4], GUILayout.Width(sm.icon.width)))
+                    if (GUILayout.Button(sm.icon, gs.customStyles[4], GUILayout.Width(sm.icon.width), GUILayout.Height(80)))
                     {
                         sm.Activate();
+                    }
+
+                    GUILayout.Space(-20);
+                    if (sm.activated)
+                    {
+                        if (!sm.queueDeactivate)
+                        {
+                            GUILayout.Label("<color=green>" + (sm.cooldown - (Time.time - sm.lastFire)).ToString("0.#") + "</color>");
+                        }
+                        else
+                        {
+                            GUILayout.Label("<color=red>" + (sm.cooldown - (Time.time - sm.lastFire)).ToString("0.#") + "</color>");
+                        }
+                    }
+                    else
+                    {
+                        GUILayout.Label("inactive");
                     }
                 }
                 GUILayout.EndVertical();
@@ -354,7 +373,11 @@ public class MainUI : MonoBehaviour {
             {
                 Windows.WindowBools["loadout"] = !Windows.WindowBools["loadout"];
             }
-
+            GUILayout.Space(10);
+            if (GUILayout.Button(sidebarIcons[1], gs.customStyles[8]))
+            {
+                Windows.WindowBools["profile"] = !Windows.WindowBools["profile"];
+            }
             GUILayout.EndVertical();
             GUILayout.EndArea();
             //print(Input.mousePosition.z);
@@ -364,8 +387,11 @@ public class MainUI : MonoBehaviour {
             if (Windows.WindowBools["loadout"])
             {
                 Windows.WindowRects["loadout"] = GUILayout.Window(0, Windows.WindowRects["loadout"], doLoadoutWindow, "Loadout");
-            }    
-
+            }
+            if (Windows.WindowBools["profile"])
+            {
+                Windows.WindowRects["profile"] = GUILayout.Window(1, Windows.WindowRects["profile"], doProfileWindow, "Profile");
+            }
 
             #endregion
 
@@ -410,5 +436,23 @@ public class MainUI : MonoBehaviour {
         {
             playerShip = GameManager.PlayerShip;
         }
+    }
+
+    public void doProfileWindow(int windowID)
+    {
+        if (GUI.Button(new Rect(382, 4, 10, 10), " ", gs.customStyles[9]))
+        {
+            Windows.WindowBools["Profile"] = false;
+        }
+
+        GUI.DragWindow(new Rect(0, 0, 100000, 400));
+        //GUILayout.BeginArea(new Rect(0, 0, Screen.width, Screen.height));
+        GUILayout.Label("Profile");
+        GUILayout.BeginVertical();
+        GUILayout.Label("Name: " + Settings.Profile.playerName);
+        GUILayout.Label("Credits: " + Settings.Profile.credits);
+
+        GUILayout.EndVertical();
+        //GUILayout.EndArea();
     }
 }

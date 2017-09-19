@@ -26,6 +26,7 @@ public class Targetable : MonoBehaviour {
 
     public Texture2D image;
 
+    public int Bounty = 100;
 
     private void Start()
     {
@@ -49,7 +50,7 @@ public class Targetable : MonoBehaviour {
         }
     }
 
-    public void takeDamage(float d, Weapon.DamageTypes t)
+    public void takeDamage(float d, Weapon.DamageTypes t, string name)
     {
         if (!Defense.isImmune)
         {
@@ -81,7 +82,7 @@ public class Targetable : MonoBehaviour {
                 {
                     remainingD = damageFinal - Defense.curShield;
                     Defense.curShield = 0;
-                    takeDamage(remainingD, t);
+                    takeDamage(remainingD, t, name);
                 }
                 else
                 {
@@ -116,7 +117,7 @@ public class Targetable : MonoBehaviour {
                 {
                     remainingD = damageFinal - Defense.curArmor;
                     Defense.curArmor = 0;
-                    takeDamage(remainingD, t);
+                    takeDamage(remainingD, t, name);
                 }
                 else
                 {
@@ -151,7 +152,6 @@ public class Targetable : MonoBehaviour {
                 {
                     remainingD = damageFinal - Defense.curStruct;
                     Defense.curStruct = 0;
-                    takeDamage(remainingD, t);
                 }
                 else
                 {
@@ -171,9 +171,11 @@ public class Targetable : MonoBehaviour {
                 {
                     Instantiate(explosion, transform.position, transform.rotation);
                 }
-                Destroy(gameObject);
-
                 GameManager.Interface.createNewNotification((targetName + " destroyed"), notification.NotificationType.damageDone);
+                GameManager.addCredits(Bounty);
+                Debug.Log(name);
+                Defense.isImmune = true;
+                Destroy(gameObject);
             }
         }
     }

@@ -23,7 +23,7 @@ public class PlayerStation : MonoBehaviour {
             GUILayout.Label(stationName);
             if (GUILayout.Button("Set Home Station"))
             {
-                Settings.SaveHomeStation(new uniqueLocation(GameManager.currentSystem, GameManager.CelestialCam.transform.position, GameManager.currentScene));
+                Settings.WriteHomeStation(GameManager.currentSystem, GameManager.CelestialCam.transform.position, GameManager.currentScene);
                 GameManager.addCredits(-100);
                 showOptions = false;
             }

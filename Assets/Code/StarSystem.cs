@@ -14,7 +14,7 @@ public class StarSystem : MonoBehaviour {
     private void Start()
     {
         SystemScale = this.transform.localScale.x;
-        GameManager.currentScene = SystemName;
+        GameManager.currentSystem = SystemName;
         GameManager.SystemRoot = gameObject;
         if (!GameManager.PlayerShip)
         {
