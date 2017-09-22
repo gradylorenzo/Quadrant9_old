@@ -30,7 +30,10 @@ public class Targetable : MonoBehaviour {
 
     private void Start()
     {
-        GameManager.PlayerShip.GetComponent<ShipWeapons>().AddAvailableTarget(gameObject);
+        if (GameManager.PlayerShip)
+        {
+            GameManager.PlayerShip.GetComponent<ShipWeapons>().AddAvailableTarget(gameObject);
+        }
 
         Defense.curShield = Defense.maxShield;
         Defense.curArmor = Defense.maxArmor;

@@ -12,7 +12,7 @@ public class CelestialCamera : MonoBehaviour {
 
     [SerializeField]
     private AnimationCurve WarpCurve = new AnimationCurve(new Keyframe(0,0), new Keyframe(50.0f, 2.0f));
-    private float WarpSpeed;
+    public float WarpSpeed;
     private float WarpDistance;
 
     private void Start()

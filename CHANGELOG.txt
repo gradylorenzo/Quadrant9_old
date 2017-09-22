@@ -1,0 +1,17 @@
+QUADRANT9 CHANGELOG
+9.21.17
+
++ Local space motion. Moving around the field is now possible, but currently limited to moving in the direction of celestials.
++ System, player, and credits display, top left.
++ Preparations for AI implementation. (see SiteManager)
++ Preparations for procedural system generation.
++ Added asteroids and dust clouds in Asteroid Belts.
++ Notification for celestial point spawns.
+> Thruster effects now respond to shop activity.
+> Particle effects replace old bubble effect as in-warp animation.
+> Number of celestial points in a single system limited to 10.
+> Moved Monitor to right edge of the screen.
+> Moved locked targets display to the left to make room for the Monitor panel.
+> Sidebar fixed to left edge.
+- Removed placeholder spheres in asteroid belts.
+

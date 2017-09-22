@@ -8,17 +8,15 @@ public class WarpBubble : MonoBehaviour {
 
     public void Update()
     {
-        this.GetComponent<Renderer>().material.SetTextureOffset("_MainTex", speed * Time.timeSinceLevelLoad);
+        if (GameManager.CelestialCam)
+        {
+            this.GetComponent<Renderer>().material.SetTextureOffset("_MainTex", speed * Time.timeSinceLevelLoad);
 
-        if(GameManager.shipTravelState == GameManager.TravelStates.Warping)
-        {
-            this.GetComponent<Renderer>().enabled = true;
-            this.GetComponent<AudioSource>().enabled = true;
-        }
-        else
-        {
-            this.GetComponent<Renderer>().enabled = false;
-            this.GetComponent<AudioSource>().enabled = false;
+            Color c = new Color(.01f, .01f, .01f, 0);
+            //c = GetComponent<Renderer>().material.GetColor("_TintColor");
+            c.a = (GameManager.CelestialCam.GetComponent<CelestialCamera>().WarpSpeed / 4) * 10;
+
+            this.GetComponent<Renderer>().material.SetColor("_TintColor", c);
         }
     }
 }

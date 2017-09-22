@@ -114,6 +114,7 @@ public static class Settings
             Profile = loadedProfile;
             GameManager.homeStation = Profile.homeStation;
             GameManager.credits = Profile.credits;
+            GameManager.playerName = name;
         }
         ReadSettings();
     }

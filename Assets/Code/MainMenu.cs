@@ -50,36 +50,43 @@ public class MainMenu : MonoBehaviour {
 
     void Initialize()
     {
-        if (PlayerPrefs.HasKey("eulaagreed"))
+        if (Settings.activeProfileXML != null && Settings.activeProfileXML != "")
         {
-            if (PlayerPrefs.GetInt("eulaagreed") == 1)
+            State = menuStates.mainMenu;
+        }
+        else
+        {
+            if (PlayerPrefs.HasKey("eulaagreed"))
             {
-                firstRun = false;
+                if (PlayerPrefs.GetInt("eulaagreed") == 1)
+                {
+                    firstRun = false;
+                }
+                else
+                {
+                    firstRun = true;
+                }
             }
             else
             {
+                PlayerPrefs.SetInt("eulaagreed", 0);
                 firstRun = true;
             }
-        }
-        else
-        {
-            PlayerPrefs.SetInt("eulaagreed", 0);
-            firstRun = true;
-        }
 
-        if (firstRun)
-        {
-            State = menuStates.eula;
-        }
-        else
-        {
-            State = menuStates.loadingSaves;
+            if (firstRun)
+            {
+                State = menuStates.eula;
+            }
+            else
+            {
+                State = menuStates.loadingSaves;
+            }
         }
     }
 
     private void Start()
     {
-        fadeBG = transform.FindChild("fading_bg").GetComponent<fadingbg>();
+        fadeBG = transform.Find("fading_bg").GetComponent<fadingbg>();
     }
 
     private void OnGUI()

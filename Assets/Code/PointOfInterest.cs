@@ -11,5 +11,6 @@ public class PointOfInterest : MonoBehaviour {
     private void Start()
     {
         GameManager.AddPointOfInterest(gameObject);
+        GameManager.Interface.createNewNotification("Sensors have detected a new anomaly: " + poiName, notification.NotificationType.standard);
     }
 }

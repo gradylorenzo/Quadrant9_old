@@ -41,9 +41,9 @@ static public class GameManager {
     static public GameObject CelestialCam;
     static public GameObject WarpTarget;
     static public GameObject PlayerShip;
+    static public SiteManager SiteManager;
 
     static public List<GameObject> poiCoords = new List<GameObject>();
-
     static public List<GameObject> Notifications = new List<GameObject>();
 
     static public float warpCharge;
@@ -79,7 +79,28 @@ static public class GameManager {
 
     static public void AddPointOfInterest(GameObject go)
     {
-        poiCoords.Add(go);
+        if (!poiCoords.Contains(go))
+        {
+            poiCoords.Add(go);
+        }
+    }
+
+    static public void RemovePointOfInterest(GameObject go)
+    {
+        if (poiCoords.Contains(go))
+        {
+            poiCoords.Remove(go);
+        }
+    }
+
+    static public void RegisterSiteManager (SiteManager sm)
+    {
+        SiteManager = sm;
+    }
+
+    static public void UnregisterSiteManager()
+    {
+        SiteManager = null;
     }
 
 #endregion
@@ -101,10 +122,13 @@ static public class GameManager {
 
     static public void enterAlign(GameObject go, string s)
     {
-        WarpTarget = go;
-        setTravelState(TravelStates.Aligning);
-        nextScene = s;
-        PlayerShip.GetComponent<ShipController>().turnSpeed = 0;
+        if (shipTravelState != TravelStates.Warping)
+        {
+            WarpTarget = go;
+            setTravelState(TravelStates.Aligning);
+            nextScene = s;
+            PlayerShip.GetComponent<ShipController>().turnSpeed = 0;
+        }
     }
 
     static public void exitAlign()
@@ -115,7 +139,7 @@ static public class GameManager {
         }
     }
 
-    static public void enterWarp(string s)
+    static public void enterWarp()
     {
         if (shipTravelState == TravelStates.Aligned)
         {
@@ -126,6 +150,14 @@ static public class GameManager {
             currentScene = nextScene;
             setTravelState(TravelStates.Warping);
             PlayerShip.GetComponent<ShipWeapons>().ClearAvailableTargets();
+            if (SiteManager)
+            {
+                UnregisterSiteManager();
+            }
+            if (PlayerShip)
+            {
+                PlayerShip.GetComponent<ShipEffects>().doWarpEnter();
+            }
         }
         else
         {
@@ -137,6 +169,11 @@ static public class GameManager {
     {
         setTravelState(GameManager.TravelStates.Stopped);
         SceneManager.LoadScene(currentScene, LoadSceneMode.Additive);
+
+        if (PlayerShip)
+        {
+            PlayerShip.GetComponent<ShipEffects>().doWarpExit();
+        }
     }
 
     static public void addCredits(int c)

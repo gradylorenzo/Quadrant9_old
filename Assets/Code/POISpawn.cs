@@ -24,9 +24,12 @@ public class POISpawn : MonoBehaviour {
 
     private void doSpawn()
     {
-        Vector3 SpawnPosition = new Vector3(Random.Range(-Range.x, Range.x), Random.Range(-Range.y, Range.y), Random.Range(-Range.z, Range.z));
-        int poiToSpawn = Random.Range(0, spawnablePointsOfInterest.Length);
-        Instantiate(spawnablePointsOfInterest[poiToSpawn], SpawnPosition, new Quaternion(0, 0, 0, 0));
+        if (GameManager.poiCoords.Count < 10)
+        {
+            Vector3 SpawnPosition = new Vector3(Random.Range(-Range.x, Range.x), Random.Range(-Range.y, Range.y), Random.Range(-Range.z, Range.z));
+            int poiToSpawn = Random.Range(0, spawnablePointsOfInterest.Length);
+            Instantiate(spawnablePointsOfInterest[poiToSpawn], SpawnPosition, new Quaternion(0, 0, 0, 0));
+        }
     }
 
     private void OnDrawGizmos()
