@@ -13,9 +13,10 @@ public class DestroyedUI : MonoBehaviour {
         GUILayout.BeginVertical();
         GUILayout.Label("Your ship was destroyed");
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Respawn"))
+        if (GUILayout.Button("Respawn: CR 10,000"))
         {
             GameManager.respawn();
+            GameManager.addCredits(-10000);
             Destroy(gameObject);
         }
         if (GUILayout.Button("Quit"))

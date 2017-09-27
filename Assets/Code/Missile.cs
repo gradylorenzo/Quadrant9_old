@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Missile : MonoBehaviour {
+public class Missile : MonoBehaviour
+{
 
     public float speed;
     public float acceleration;
@@ -15,8 +16,10 @@ public class Missile : MonoBehaviour {
     public Weapon.WeaponTypes weaponType = Weapon.WeaponTypes.missile;
 
     private bool allowTargeting = false;
-    
-
+    private bool targetLocked = false;
+    private Vector3 relativePos = new Vector3();
+    private GameObject selectedST;
+    private bool usingST = false;
     private void Start()
     {
         if (this.transform.Find("plume"))
@@ -32,9 +35,28 @@ public class Missile : MonoBehaviour {
     {
         if (target && allowTargeting)
         {
-            Vector3 relativePos = (target.transform.position - this.transform.position);
-            this.transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(relativePos), damp);
+            if (!targetLocked)
+            {
+                if(target.GetComponent<Targetable>().subtargets.Length > 0)
+                {
+                    int i = Random.Range(0, target.GetComponent<Targetable>().subtargets.Length);
+                    selectedST = target.GetComponent<Targetable>().subtargets[i];
+                }
+                targetLocked = true;
+            }
+
+            if (selectedST)
+            {
+                relativePos = selectedST.transform.position;
+            }
+            else
+            {
+                relativePos = target.transform.position;
+            }
+
+            this.transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(relativePos - transform.position), damp);
             speed += acceleration;
+
         }
 
         transform.Translate(Vector3.forward * speed);
@@ -78,5 +100,11 @@ public class Missile : MonoBehaviour {
     private void startTarg()
     {
         allowTargeting = true;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawSphere(relativePos, 1);
     }
 }

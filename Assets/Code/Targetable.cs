@@ -27,6 +27,8 @@ public class Targetable : MonoBehaviour {
     public Texture2D image;
 
     public int Bounty = 100;
+    public GameObject[] subtargets;
+
 
     private void Start()
     {
@@ -181,5 +183,9 @@ public class Targetable : MonoBehaviour {
                 Destroy(gameObject);
             }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
     }
 }

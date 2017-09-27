@@ -67,6 +67,15 @@ static public class GameManager {
         SystemRoot.GetComponent<StarSystem>().SpawnShip(ps);
     }
 
+    static public void spawn()
+    {
+        CelestialCam.transform.position = homeStation.point;
+        currentScene = homeStation.sceneName;
+        exitWarp();
+        GameObject ps = Resources.Load("Prefabs/Charybdis") as GameObject;
+        SystemRoot.GetComponent<StarSystem>().SpawnShip(ps);
+    }
+
     static public void setPlayerShip(GameObject go)
     {
         PlayerShip = go;
@@ -146,6 +155,10 @@ static public class GameManager {
             if (currentScene != "" && currentScene != null)
             {
                 SMUnload(currentScene);
+            }
+            if (SiteManager)
+            {
+                UnregisterSiteManager();
             }
             currentScene = nextScene;
             setTravelState(TravelStates.Warping);

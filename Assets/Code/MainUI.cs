@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class MainUI : MonoBehaviour {
+public class MainUI : MonoBehaviour
+{
 
     public class UIWindows
     {
@@ -11,12 +13,14 @@ public class MainUI : MonoBehaviour {
 
         public Dictionary<string, Rect> WindowRects = new Dictionary<string, Rect>()
         {
+            {"quit", new Rect(200, 200, 500, 500) },
             {"loadout", new Rect(200, 200, 500, 500) },
             {"profile", new Rect(200, 200, 500, 500) },
         };
 
         public Dictionary<string, bool> WindowBools = new Dictionary<string, bool>()
         {
+            {"quit", false },
             {"loadout", false },
             {"profile", false },
         };
@@ -51,10 +55,13 @@ public class MainUI : MonoBehaviour {
     private float wantedsbPos = -68;
     private int i = 0;
 
+
+    private bool confirmQuit = false;
     private void Start()
     {
         playerShip = GameManager.PlayerShip;
         cam = this.GetComponent<Camera>();
+        print(GameManager.playerName);
     }
 
     public void OnGUI()
@@ -113,9 +120,9 @@ public class MainUI : MonoBehaviour {
 
             GUILayout.BeginVertical();
             GUILayout.Label("Celestial Points");
-            foreach(GameObject go in GameManager.poiCoords)
+            foreach (GameObject go in GameManager.poiCoords)
             {
-                
+
                 float dis = Vector3.Distance(GameManager.CelestialCam.transform.position, go.transform.position);
                 if (dis > .05f)
                 {
@@ -138,7 +145,7 @@ public class MainUI : MonoBehaviour {
                 }
             }
 
-            
+
             GUILayout.Label("Targets");
             foreach (GameObject go in weapons.AvailableTargets)
             {
@@ -235,90 +242,90 @@ public class MainUI : MonoBehaviour {
                 GUILayout.EndVertical();
                 GUILayout.EndArea();
             }
-                #endregion
+            #endregion
 
             #region in-space_icons
-                //Ship icons in-space
-                if (weapons.AvailableTargets.Count > 0)
+            //Ship icons in-space
+            if (weapons.AvailableTargets.Count > 0)
+            {
+                foreach (GameObject go in weapons.AvailableTargets)
                 {
-                    foreach (GameObject go in weapons.AvailableTargets)
-                    {
                     Vector3 relativePos = go.transform.position - GameManager.CelestialCam.transform.position;
                     Quaternion lookRot = Quaternion.LookRotation(relativePos);
                     float ang = Quaternion.Angle(lookRot, GameManager.CelestialCam.transform.rotation);
 
                     if (go.GetComponent<Targetable>().Type == Targetable.targetTypes.hostile && go.transform.Find("graphic").GetComponent<Renderer>().isVisible)
+                    {
+                        Vector3 pos = cam.WorldToScreenPoint(go.transform.position);
+                        GUI.DrawTexture(new Rect(pos.x - (icons[1].width / 2), Screen.height - (pos.y + (icons[1].height / 2)), icons[1].width, icons[1].height), icons[1]);
+                    }
+                }
+            }
+
+            //Selected target icon
+            if (weapons.SelectedTarget != null)
+            {
+                if (weapons.SelectedTarget.transform.Find("graphic").GetComponent<Renderer>().isVisible)
+                {
+                    Vector3 pos = cam.WorldToScreenPoint(weapons.SelectedTarget.transform.position);
+                    GUI.DrawTexture(new Rect(pos.x - (icons[0].width / 2), Screen.height - (pos.y + (icons[0].height / 2)), icons[0].width, icons[0].height), icons[0]);
+                }
+            }
+
+            //POI Icons
+            if (GameManager.poiCoords.Count > 0)
+            {
+                foreach (GameObject go in GameManager.poiCoords)
+                {
+                    Vector3 relativePos = go.transform.position - GameManager.CelestialCam.transform.position;
+                    Quaternion lookRot = Quaternion.LookRotation(relativePos);
+                    float ang = Quaternion.Angle(lookRot, GameManager.CelestialCam.transform.rotation);
+                    float dis = Vector3.Distance(GameManager.CelestialCam.transform.position, go.transform.position);
+                    if (ang < GameManager.CelestialCam.GetComponent<Camera>().fieldOfView + 4 && dis > .1f)
+                    {
+                        Vector3 pos = GameManager.CelestialCam.GetComponent<Camera>().WorldToScreenPoint(go.transform.position);
+                        if (GUI.Button(new Rect(pos.x - (icons[2].width / 2), Screen.height - (pos.y + (icons[2].height / 2)), icons[2].width, icons[2].height), icons[2], gs.customStyles[6]))
                         {
-                            Vector3 pos = cam.WorldToScreenPoint(go.transform.position);
-                            GUI.DrawTexture(new Rect(pos.x - (icons[1].width / 2), Screen.height - (pos.y + (icons[1].height / 2)), icons[1].width, icons[1].height), icons[1]);
+                            GameManager.enterAlign(go, go.GetComponent<PointOfInterest>().sceneToLoad);
+                        }
+
+                        float mDis = Vector2.Distance(pos, Input.mousePosition);
+                        if (mDis < 20)
+                        {
+                            GUI.Label(new Rect(pos.x + 13, Screen.height - (pos.y + 8), go.GetComponent<PointOfInterest>().poiName.Length * 8, 16), go.GetComponent<PointOfInterest>().poiName, gs.customStyles[10]);
                         }
                     }
                 }
-
-                //Selected target icon
-                if (weapons.SelectedTarget != null)
-                {
-                    if (weapons.SelectedTarget.transform.Find("graphic").GetComponent<Renderer>().isVisible)
-                    {
-                        Vector3 pos = cam.WorldToScreenPoint(weapons.SelectedTarget.transform.position);
-                        GUI.DrawTexture(new Rect(pos.x - (icons[0].width / 2), Screen.height - (pos.y + (icons[0].height / 2)), icons[0].width, icons[0].height), icons[0]);
-                    }
-                }
-
-                //POI Icons
-                if(GameManager.poiCoords.Count > 0)
-                {
-                    foreach(GameObject go in GameManager.poiCoords)
-                    {
-                        Vector3 relativePos = go.transform.position - GameManager.CelestialCam.transform.position;
-                        Quaternion lookRot = Quaternion.LookRotation(relativePos);
-                        float ang = Quaternion.Angle(lookRot, GameManager.CelestialCam.transform.rotation);
-                        float dis = Vector3.Distance(GameManager.CelestialCam.transform.position, go.transform.position);
-                        if (ang < GameManager.CelestialCam.GetComponent<Camera>().fieldOfView + 4  && dis > .1f)
-                        {
-                            Vector3 pos = GameManager.CelestialCam.GetComponent<Camera>().WorldToScreenPoint(go.transform.position);
-                            if(GUI.Button(new Rect(pos.x - (icons[2].width / 2), Screen.height - (pos.y + (icons[2].height / 2)), icons[2].width, icons[2].height), icons[2], gs.customStyles[6]))
-                            {
-                                GameManager.enterAlign(go, go.GetComponent<PointOfInterest>().sceneToLoad);
-                            }
-
-                            float mDis = Vector2.Distance(pos, Input.mousePosition);
-                            if(mDis < 20)
-                            {
-                                GUI.Label(new Rect(pos.x + 13, Screen.height - (pos.y + 8), go.GetComponent<PointOfInterest>().poiName.Length * 8, 16), go.GetComponent<PointOfInterest>().poiName, gs.customStyles[10]);
-                            }
-                        }
-                    }
-                }
+            }
             #endregion
 
             #region health_display
             GUI.BeginGroup(new Rect(320, Screen.height - 55, Screen.width - 320, 55));
-                GUI.Label(new Rect(0, 0, 100, 30), "Shields: ");
-                GUI.Label(new Rect(0, 15, 100, 30), "Armor  : ");
-                GUI.Label(new Rect(0, 30, 100, 30), "Struct : ");
+            GUI.Label(new Rect(0, 0, 100, 30), "Shields: ");
+            GUI.Label(new Rect(0, 15, 100, 30), "Armor  : ");
+            GUI.Label(new Rect(0, 30, 100, 30), "Struct : ");
 
-                mShield = playerShip.GetComponent<ShipSheet>().Defense.maxShield;
-                mArmor = playerShip.GetComponent<ShipSheet>().Defense.maxArmor;
-                mStruct = playerShip.GetComponent<ShipSheet>().Defense.maxStruct;
+            mShield = playerShip.GetComponent<ShipSheet>().Defense.maxShield;
+            mArmor = playerShip.GetComponent<ShipSheet>().Defense.maxArmor;
+            mStruct = playerShip.GetComponent<ShipSheet>().Defense.maxStruct;
 
-                cShield = Mathf.Lerp(cShield, playerShip.GetComponent<ShipSheet>().Defense.curShield, .1f);
-                cArmor = Mathf.Lerp(cArmor, playerShip.GetComponent<ShipSheet>().Defense.curArmor, .1f);
-                cStruct = Mathf.Lerp(cStruct, playerShip.GetComponent<ShipSheet>().Defense.curStruct, .1f);
+            cShield = Mathf.Lerp(cShield, playerShip.GetComponent<ShipSheet>().Defense.curShield, .1f);
+            cArmor = Mathf.Lerp(cArmor, playerShip.GetComponent<ShipSheet>().Defense.curArmor, .1f);
+            cStruct = Mathf.Lerp(cStruct, playerShip.GetComponent<ShipSheet>().Defense.curStruct, .1f);
 
 
-                GUI.DrawTexture(new Rect(70, 5, 200, 10), barBG);
-                GUI.DrawTexture(new Rect(70, 5, Mathf.Lerp(0, 1, (cShield / mShield)) * 200, 10), bar);
+            GUI.DrawTexture(new Rect(70, 5, 200, 10), barBG);
+            GUI.DrawTexture(new Rect(70, 5, Mathf.Lerp(0, 1, (cShield / mShield)) * 200, 10), bar);
 
-                GUI.DrawTexture(new Rect(70, 20, 200, 10), barBG);
-                GUI.DrawTexture(new Rect(70, 20, Mathf.Lerp(0, 1, (cArmor / mArmor)) * 200, 10), bar);
+            GUI.DrawTexture(new Rect(70, 20, 200, 10), barBG);
+            GUI.DrawTexture(new Rect(70, 20, Mathf.Lerp(0, 1, (cArmor / mArmor)) * 200, 10), bar);
 
-                GUI.DrawTexture(new Rect(70, 35, 200, 10), barBG);
-                GUI.DrawTexture(new Rect(70, 35, Mathf.Lerp(0, 1, (cStruct / mStruct)) * 200, 10), bar);
+            GUI.DrawTexture(new Rect(70, 35, 200, 10), barBG);
+            GUI.DrawTexture(new Rect(70, 35, Mathf.Lerp(0, 1, (cStruct / mStruct)) * 200, 10), bar);
 
-                GUI.Label(new Rect(280, 0, 100, 30), Convert.ToInt32(cShield) / 1000 + "%");
-                GUI.Label(new Rect(280, 15, 100, 30), Convert.ToInt32(cArmor) / 1000 + "%");
-                GUI.Label(new Rect(280, 30, 100, 30), Convert.ToInt32(cStruct) / 1000 + "%");
+            GUI.Label(new Rect(280, 0, 100, 30), Convert.ToInt32(cShield) / 1000 + "%");
+            GUI.Label(new Rect(280, 15, 100, 30), Convert.ToInt32(cArmor) / 1000 + "%");
+            GUI.Label(new Rect(280, 30, 100, 30), Convert.ToInt32(cStruct) / 1000 + "%");
             GUI.EndGroup();
             #endregion
 
@@ -380,7 +387,7 @@ public class MainUI : MonoBehaviour {
                 GUILayout.EndArea();
             }
 
-#endregion
+            #endregion
 
             #region sidebar
 
@@ -397,6 +404,10 @@ public class MainUI : MonoBehaviour {
             {
                 Windows.WindowBools["profile"] = !Windows.WindowBools["profile"];
             }
+            if (GUILayout.Button(sidebarIcons[2], gs.customStyles[8], GUILayout.Width(64), GUILayout.Height(64)))
+            {
+                Windows.WindowBools["quit"] = !Windows.WindowBools["quit"];
+            }
             GUILayout.EndVertical();
             GUILayout.EndArea();
             //print(Input.mousePosition.z);
@@ -411,9 +422,50 @@ public class MainUI : MonoBehaviour {
             {
                 Windows.WindowRects["profile"] = GUILayout.Window(1, Windows.WindowRects["profile"], doProfileWindow, "Profile");
             }
+            if (Windows.WindowBools["quit"])
+            {
+                Windows.WindowRects["quit"] = GUILayout.Window(2, Windows.WindowRects["quit"], doQuitWindow, "Quit");
+            }
 
             #endregion
 
+        }
+        else
+        {
+            playerShip = GameManager.PlayerShip;
+        }
+    }
+
+    //game window
+    public void doQuitWindow(int windowID)
+    {
+        if (GUI.Button(new Rect(382, 4, 10, 10), " ", gs.customStyles[9]))
+        {
+            Windows.WindowBools["quit"] = false;
+        }
+
+        if (playerShip)
+        {
+            //GUI.DragWindow(new Rect(0, 0, 100000, 400));
+            //GUILayout.BeginArea(new Rect(4, 20, 394, 200));
+            GUILayout.BeginVertical();
+            GUILayout.Label("Are you sure?", gs.customStyles[0]);
+            GUILayout.Space(4);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("No", GUILayout.Width(196), GUILayout.Height(60)))
+            {
+                confirmQuit = false;
+            }
+            GUILayout.Space(4);
+            if (GUILayout.Button("Yes", GUILayout.Width(196), GUILayout.Height(60)))
+            {
+                GameManager.Notifications.Clear();
+                GameManager.poiCoords.Clear();
+                SceneManager.LoadScene("MainMenu");
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            //GUILayout.EndArea();
         }
         else
         {

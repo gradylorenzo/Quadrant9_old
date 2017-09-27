@@ -1,4 +1,19 @@
 QUADRANT9 CHANGELOG
+
+9.26.17
+
++ New star shader.
++ AI Movement.
++ Quit button in sidebar.
+> Missiles no longer target just the target's axis.
+> Fixed a bug that caused AI lasers to remain visible after player ship was destroyed.
+> Fixed a bug that caused the explosion created by the player's ship being destroyed
+	to remain in space after respawning.
+> Fixed a bug that would cause the UI to crash if the player backed out to the main
+	menu, and went back into the game.
+
+
+
 9.21.17
 
 + Local space motion. Moving around the field is now possible, but currently limited to moving in the direction of celestials.

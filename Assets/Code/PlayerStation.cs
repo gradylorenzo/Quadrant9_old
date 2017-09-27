@@ -7,6 +7,7 @@ public class PlayerStation : MonoBehaviour {
     public string stationName = "";
     public bool showOptions = false;
     public Vector2 mouseClickPoint;
+    public int homeStationPrice;
 
     private void OnMouseUpAsButton()
     {
@@ -24,7 +25,7 @@ public class PlayerStation : MonoBehaviour {
             if (GUILayout.Button("Set Home Station"))
             {
                 Settings.WriteHomeStation(GameManager.currentSystem, GameManager.CelestialCam.transform.position, GameManager.currentScene);
-                GameManager.addCredits(-100);
+                GameManager.addCredits(-homeStationPrice);
                 showOptions = false;
             }
             if (GUILayout.Button("Close"))

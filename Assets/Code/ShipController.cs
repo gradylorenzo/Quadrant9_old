@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class ShipController : MonoBehaviour {
+public class ShipController : MonoBehaviour
+{
 
     public float warpCharge = 0.0f;
     public float warpChargeSpeed = 0.1f;
@@ -34,7 +35,7 @@ public class ShipController : MonoBehaviour {
     {
         flightSpeed = Mathf.MoveTowards(flightSpeed, wantedFlightSpeed, flightAcceleration);
 
-        if(GameManager.shipTravelState == GameManager.TravelStates.Aligning || GameManager.shipTravelState == GameManager.TravelStates.Aligned)
+        if (GameManager.shipTravelState == GameManager.TravelStates.Aligning || GameManager.shipTravelState == GameManager.TravelStates.Aligned)
         {
             wantedFlightSpeed = maxFlightSpeed;
             transform.Translate(0, 0, flightSpeed);
@@ -43,7 +44,7 @@ public class ShipController : MonoBehaviour {
         {
             //wantedFlightSpeed = 0;
         }
-        
+
 
         if (GameManager.shipTravelState == GameManager.TravelStates.Aligning)
         {
@@ -53,20 +54,20 @@ public class ShipController : MonoBehaviour {
             float amp = turnSpeedCurve.Evaluate(ang);
 
             transform.rotation = Quaternion.RotateTowards(transform.rotation, alignRotation, turnSpeed * amp);
-            
 
 
-            if(Quaternion.Angle(this.transform.rotation, alignRotation) < 1.0f && warpCharge < 10)
+
+            if (Quaternion.Angle(this.transform.rotation, alignRotation) < 1.0f && warpCharge < 10)
             {
                 warpCharge = Mathf.Clamp(warpCharge += warpChargeSpeed, 0, 10);
             }
 
-            if(Quaternion.Angle(this.transform.rotation, alignRotation) < 1.0f && warpCharge == 10)
+            if (Quaternion.Angle(this.transform.rotation, alignRotation) < 1.0f && warpCharge == 10)
             {
                 GameManager.setTravelState(GameManager.TravelStates.Aligned);
             }
         }
-        else if(GameManager.shipTravelState == GameManager.TravelStates.Warping)
+        else if (GameManager.shipTravelState == GameManager.TravelStates.Warping)
         {
             warpCharge = 0;
             this.transform.position = Vector3.zero;
@@ -75,7 +76,7 @@ public class ShipController : MonoBehaviour {
             wantedFlightSpeed = maxFlightSpeed;
         }
 
-        if(turnSpeed < maxTurnSpeed)
+        if (turnSpeed < maxTurnSpeed)
         {
             turnSpeed = Mathf.Clamp(turnSpeed + .01f, 0, maxTurnSpeed);
         }

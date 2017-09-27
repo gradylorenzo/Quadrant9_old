@@ -18,7 +18,7 @@ public class StarSystem : MonoBehaviour {
         GameManager.SystemRoot = gameObject;
         if (!GameManager.PlayerShip)
         {
-            GameManager.respawn();
+            GameManager.spawn();
         }
     }
 

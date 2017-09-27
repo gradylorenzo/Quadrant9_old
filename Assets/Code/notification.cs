@@ -33,9 +33,12 @@ public class notification : MonoBehaviour {
         wantedXPos = 0;
         fade = 1;
         timestamp = Time.time;
-        foreach(GameObject go in GameManager.Notifications)
+        if (GameManager.Notifications.Count > 0)
         {
-            go.GetComponent<notification>().wantedXPos += 15;
+            foreach (GameObject go in GameManager.Notifications)
+            {
+                go.GetComponent<notification>().wantedXPos += 15;
+            }
         }
         GameManager.addNotification(gameObject);
     }

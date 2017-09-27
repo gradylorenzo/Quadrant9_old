@@ -47,7 +47,6 @@ public class MouseOrbit : MonoBehaviour
     public void doShake()
     {
         shakeCurrent = 1;
-        print("shake");
     }
 
     void LateUpdate()
